@@ -4,7 +4,6 @@
 #include <metal/cpu.h>
 #include <metal/i2c.h>
 #include <metal/io.h>
-#include <metal/machine.h>
 #include <metal/uart.h>
 #include <stdio.h>
 #include <time.h>
@@ -28,21 +27,18 @@
   while (timeout > time(NULL))                                                 \
     ;
 
+#ifdef metal_i2c_0
+#define i2c metal_i2c_0
+#endif
+
 int main(void) {
+#ifdef i2c
   unsigned int temp, volt;
   unsigned char buf[LEN2];
   time_t timeout;
-  struct metal_i2c *i2c;
 
   printf("%s %s \n", __DATE__, __TIME__);
   printf("I2C demo test..\n");
-
-  i2c = metal_i2c_get_device(0);
-
-  if (i2c == NULL) {
-    printf("I2C not available \n");
-    return RET_NOK;
-  }
 
   metal_i2c_init(i2c, I2C_BAUDRATE, METAL_I2C_MASTER);
 
@@ -103,6 +99,9 @@ int main(void) {
     /* Wait 1s */
     WAIT_1S(timeout);
   }
+#else
+  printf("I2C not available \n");
+#endif
 
   return RET_OK;
 }
